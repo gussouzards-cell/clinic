@@ -1,0 +1,2368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FLUAP CLINIC - Plataforma Institucional para Gestão de Equipes, Governança, Farmácia, Pacientes e Operações">
+    <title>FLUAP CLINIC - Plataforma Institucional</title>
+    <style>
+        :root {
+            /* Cores principais */
+            --color-primary: #0066cc;
+            --color-primary-dark: #004499;
+            --color-primary-light: #e6f2ff;
+            --color-success: #00cc66;
+            --color-danger: #dc3545;
+            --color-warning: #ffc107;
+            --color-info: #17a2b8;
+            
+            /* Cores neutras */
+            --color-text: #333;
+            --color-text-light: #666;
+            --color-text-lighter: #999;
+            --color-bg: #f5f7fa;
+            --color-bg-light: #ffffff;
+            --color-border: #ddd;
+            --color-border-light: #e0e0e0;
+            
+            /* Espaçamentos */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-xxl: 48px;
+            
+            /* Bordas */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            
+            /* Transições */
+            --transition-fast: 0.2s;
+            --transition-normal: 0.3s;
+            --transition-slow: 0.5s;
+            
+            /* Sombras */
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            display: flex;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+            color: white;
+            padding: var(--spacing-lg);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-md);
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: var(--spacing-xl);
+            padding-bottom: var(--spacing-lg);
+            border-bottom: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px var(--spacing-md);
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            transition: all var(--transition-normal);
+            cursor: pointer;
+            outline: none;
+        }
+
+        .nav-link:hover,
+        .nav-link:focus {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            outline: 2px solid rgba(255,255,255,0.3);
+            outline-offset: 2px;
+        }
+
+        .nav-link.active {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-weight: bold;
+        }
+
+        .nav-link::before {
+            content: "→";
+            margin-right: 12px;
+            opacity: 0.7;
+            transition: transform var(--transition-normal);
+        }
+
+        .nav-link.active::before {
+            transform: translateX(4px);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: var(--spacing-lg);
+            transition: margin-left var(--transition-normal);
+        }
+
+        .page {
+            display: none;
+            background: var(--color-bg-light);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            animation: fadeIn var(--transition-normal);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .page-header {
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 2px solid var(--color-primary-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+
+        .page-title {
+            color: var(--color-primary);
+            font-size: 2em;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .page-subtitle {
+            color: var(--color-text-light);
+            font-size: 0.95em;
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .kpi-box {
+            background: linear-gradient(135deg, var(--color-primary-light) 0%, #cce5ff 100%);
+            border: 1px solid var(--color-primary);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            text-align: center;
+            transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+            cursor: pointer;
+        }
+
+        .kpi-box:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .kpi-label {
+            color: var(--color-text-light);
+            font-size: 0.9em;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .kpi-value {
+            color: var(--color-primary);
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .kpi-change {
+            font-size: 0.85em;
+            color: var(--color-success);
+        }
+
+        .kpi-change.warning {
+            color: var(--color-warning);
+        }
+
+        .kpi-change.danger {
+            color: var(--color-danger);
+        }
+
+        /* Alerts */
+        .alerts-section {
+            background: #fff3cd;
+            border-left: 4px solid var(--color-warning);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .alerts-section h3 {
+            margin-bottom: var(--spacing-md);
+            color: #856404;
+        }
+
+        .alert-item {
+            padding: 12px;
+            margin-bottom: var(--spacing-sm);
+            background: white;
+            border-radius: var(--radius-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform var(--transition-fast);
+        }
+
+        .alert-item:hover {
+            transform: translateX(4px);
+        }
+
+        .alert-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .alert-badge {
+            background: var(--color-warning);
+            color: #856404;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .alert-badge.urgent {
+            background: var(--color-danger);
+            color: white;
+        }
+
+        .alert-badge.info {
+            background: var(--color-info);
+            color: white;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+        }
+
+        .action-card {
+            background: #f8f9fa;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            text-decoration: none;
+            color: var(--color-text);
+            outline: none;
+        }
+
+        .action-card:hover,
+        .action-card:focus {
+            background: var(--color-primary-light);
+            border-color: var(--color-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px;
+        }
+
+        .action-card-icon {
+            font-size: 2.5em;
+            margin-bottom: 12px;
+        }
+
+        .action-card-title {
+            color: var(--color-primary);
+            font-weight: bold;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            margin-top: var(--spacing-lg);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: var(--color-primary-light);
+            color: var(--color-primary);
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            border-bottom: 2px solid var(--color-primary);
+            position: sticky;
+            top: 0;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--color-border-light);
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px var(--spacing-lg);
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1em;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            font-weight: 500;
+            outline: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .btn:focus {
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0052a3;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: var(--color-success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--color-danger);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.85em;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn var(--transition-fast);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp var(--transition-normal);
+            box-shadow: var(--shadow-lg);
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 2px solid var(--color-primary-light);
+        }
+
+        .modal-title {
+            color: var(--color-primary);
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: var(--color-text-light);
+            padding: var(--spacing-xs);
+            border-radius: var(--radius-sm);
+            transition: all var(--transition-fast);
+            outline: none;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: var(--color-text);
+            background: var(--color-primary-light);
+            outline: 2px solid var(--color-primary);
+            outline-offset: 2px;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: var(--spacing-sm);
+            color: var(--color-text);
+            font-weight: 500;
+        }
+
+        .form-label.required::after {
+            content: " *";
+            color: var(--color-danger);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            font-size: 1em;
+            font-family: inherit;
+            transition: all var(--transition-fast);
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+        }
+
+        .form-input.error,
+        .form-select.error {
+            border-color: var(--color-danger);
+        }
+
+        .form-error {
+            color: var(--color-danger);
+            font-size: 0.85em;
+            margin-top: var(--spacing-xs);
+            display: none;
+        }
+
+        .form-error.show {
+            display: block;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Permission Card */
+        .permission-card {
+            background: #f8f9fa;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            transition: box-shadow var(--transition-normal);
+        }
+
+        .permission-card:hover {
+            box-shadow: var(--shadow-sm);
+        }
+
+        .permission-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .permission-title {
+            color: var(--color-primary);
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .permission-modules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+        }
+
+        .switch-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: var(--transition-normal);
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: var(--transition-normal);
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--color-primary);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 0 3px rgba(0,102,204,0.2);
+        }
+
+        /* Audit Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline::before {
+            content: "";
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--color-primary);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: var(--spacing-lg);
+            background: #f8f9fa;
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            border-left: 3px solid var(--color-primary);
+            transition: transform var(--transition-fast);
+        }
+
+        .timeline-item:hover {
+            transform: translateX(4px);
+        }
+
+        .timeline-item::before {
+            content: "";
+            position: absolute;
+            left: -28px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            border: 2px solid white;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-sm);
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+        }
+
+        .timeline-action {
+            color: var(--color-primary);
+            font-weight: bold;
+        }
+
+        .timeline-date {
+            color: var(--color-text-light);
+            font-size: 0.85em;
+        }
+
+        /* Filters */
+        .filters {
+            background: #f8f9fa;
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+            align-items: end;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        /* Patient Card */
+        .patient-card {
+            background: white;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            transition: all var(--transition-normal);
+            cursor: pointer;
+        }
+
+        .patient-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .patient-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+
+        .patient-name {
+            color: var(--color-primary);
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .patient-meta {
+            color: var(--color-text-light);
+            font-size: 0.9em;
+            margin-top: var(--spacing-xs);
+        }
+
+        .patient-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-md);
+        }
+
+        .patient-stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .patient-stat-label {
+            color: var(--color-text-light);
+            font-size: 0.9em;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .patient-stat-value {
+            font-size: 1.5em;
+            color: var(--color-primary);
+            font-weight: bold;
+        }
+
+        .adherence-bar {
+            height: 8px;
+            background: var(--color-border-light);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: var(--spacing-sm);
+        }
+
+        .adherence-fill {
+            height: 100%;
+            background: var(--color-success);
+            transition: width var(--transition-normal);
+        }
+
+        .adherence-fill.warning {
+            background: var(--color-warning);
+        }
+
+        .adherence-fill.danger {
+            background: var(--color-danger);
+        }
+
+        /* Document Card */
+        .document-card {
+            background: white;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all var(--transition-normal);
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+
+        .document-card:hover {
+            box-shadow: var(--shadow-sm);
+            transform: translateX(4px);
+        }
+
+        .document-info {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .document-name {
+            color: var(--color-primary);
+            font-weight: bold;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .document-meta {
+            color: var(--color-text-light);
+            font-size: 0.85em;
+        }
+
+        .document-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        /* Stock Dashboard */
+        .stock-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .stock-card {
+            background: #f8f9fa;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+        }
+
+        .stock-card.critical {
+            border-color: var(--color-danger);
+            background: #fff5f5;
+        }
+
+        .stock-card.warning {
+            border-color: var(--color-warning);
+            background: #fffbf0;
+        }
+
+        .stock-card h3 {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .stock-card.critical h3 {
+            color: var(--color-danger);
+        }
+
+        .stock-card.warning h3 {
+            color: #856404;
+        }
+
+        .stock-item {
+            padding: 12px;
+            background: white;
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--spacing-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+        }
+
+        .stock-item-info {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .stock-item-name {
+            font-weight: bold;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .stock-item-detail {
+            color: var(--color-text-light);
+            font-size: 0.9em;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: var(--spacing-lg);
+            right: var(--spacing-lg);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .toast {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md) var(--spacing-lg);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            min-width: 300px;
+            animation: slideInRight var(--transition-normal);
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .toast.success {
+            border-left-color: var(--color-success);
+        }
+
+        .toast.error {
+            border-left-color: var(--color-danger);
+        }
+
+        .toast.warning {
+            border-left-color: var(--color-warning);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast-icon {
+            font-size: 1.5em;
+        }
+
+        .toast-message {
+            flex: 1;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            color: var(--color-text-light);
+            padding: var(--spacing-xs);
+        }
+
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0,102,204,0.3);
+            border-radius: 50%;
+            border-top-color: var(--color-primary);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: var(--spacing-xxl);
+            color: var(--color-text-light);
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: var(--spacing-md);
+            opacity: 0.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                max-height: 300px;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                flex-direction: column;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .filter-group {
+                width: 100%;
+            }
+
+            .patient-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .document-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* Utility Classes */
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .mb-0 {
+            margin-bottom: 0;
+        }
+
+        .mt-lg {
+            margin-top: var(--spacing-lg);
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .gap-sm {
+            gap: var(--spacing-sm);
+        }
+
+        .gap-md {
+            gap: var(--spacing-md);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" role="navigation" aria-label="Navegação principal">
+        <div class="logo">FLUAP CLINIC</div>
+        <nav>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a class="nav-link active" data-page="dashboard" href="#dashboard" aria-current="page">
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="users" href="#users">
+                        Gestão de Usuários
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="permissions" href="#permissions">
+                        Permissões
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="audit" href="#audit">
+                        Auditoria
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="patients" href="#patients">
+                        Pacientes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="stock" href="#stock">
+                        Farmácia/Estoque
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-page="documents" href="#documents">
+                        Documentos
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" role="main">
+        <!-- Toast Container -->
+        <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+        <!-- Dashboard Page -->
+        <div id="dashboard" class="page active" role="region" aria-label="Dashboard Institucional">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Dashboard Institucional</h1>
+                    <p class="page-subtitle">Visão geral da operação institucional</p>
+                </div>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-box" role="button" tabindex="0" aria-label="Pacientes Ativos: 1,247">
+                    <div class="kpi-label">Pacientes Ativos</div>
+                    <div class="kpi-value">1,247</div>
+                    <div class="kpi-change">+12% este mês</div>
+                </div>
+                <div class="kpi-box" role="button" tabindex="0" aria-label="Prescrições: 3,891">
+                    <div class="kpi-label">Prescrições</div>
+                    <div class="kpi-value">3,891</div>
+                    <div class="kpi-change">+8% este mês</div>
+                </div>
+                <div class="kpi-box" role="button" tabindex="0" aria-label="Estoque Crítico: 23 itens">
+                    <div class="kpi-label">Estoque Crítico</div>
+                    <div class="kpi-value">23</div>
+                    <div class="kpi-change danger">Atenção necessária</div>
+                </div>
+                <div class="kpi-box" role="button" tabindex="0" aria-label="Validades Próximas: 15 itens">
+                    <div class="kpi-label">Validades Próximas</div>
+                    <div class="kpi-value">15</div>
+                    <div class="kpi-change warning">Próximos 30 dias</div>
+                </div>
+            </div>
+
+            <div class="alerts-section">
+                <h3>Alertas Recentes</h3>
+                <div class="alert-item">
+                    <div>
+                        <strong>Estoque crítico: Paracetamol 500mg</strong>
+                        <p class="patient-meta">Quantidade abaixo do mínimo recomendado</p>
+                    </div>
+                    <span class="alert-badge urgent">URGENTE</span>
+                </div>
+                <div class="alert-item">
+                    <div>
+                        <strong>Validade próxima: Dipirona 1g</strong>
+                        <p class="patient-meta">Vencimento em 15 dias</p>
+                    </div>
+                    <span class="alert-badge">ATENÇÃO</span>
+                </div>
+                <div class="alert-item">
+                    <div>
+                        <strong>Novo paciente vinculado</strong>
+                        <p class="patient-meta">João Silva foi vinculado à instituição</p>
+                    </div>
+                    <span class="alert-badge info">INFO</span>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <a href="#stock" class="action-card" onclick="showPage('stock'); return false;" aria-label="Acessar Farmácia/Estoque">
+                    <div class="action-card-icon" aria-hidden="true">📦</div>
+                    <div class="action-card-title">Farmácia/Estoque</div>
+                </a>
+                <a href="#patients" class="action-card" onclick="showPage('patients'); return false;" aria-label="Acessar Pacientes">
+                    <div class="action-card-icon" aria-hidden="true">👥</div>
+                    <div class="action-card-title">Pacientes</div>
+                </a>
+                <a href="#audit" class="action-card" onclick="showPage('audit'); return false;" aria-label="Acessar Auditoria">
+                    <div class="action-card-icon" aria-hidden="true">📋</div>
+                    <div class="action-card-title">Auditoria</div>
+                </a>
+                <a href="#users" class="action-card" onclick="showPage('users'); return false;" aria-label="Acessar Usuários">
+                    <div class="action-card-icon" aria-hidden="true">👤</div>
+                    <div class="action-card-title">Usuários</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Users Page -->
+        <div id="users" class="page" role="region" aria-label="Gestão de Usuários">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Gestão de Usuários</h1>
+                    <p class="page-subtitle">Gerencie usuários e permissões institucionais</p>
+                </div>
+                <button class="btn btn-primary" onclick="openUserModal()" aria-label="Criar novo usuário">
+                    + Criar Usuário
+                </button>
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label class="form-label" for="userSearch">Buscar</label>
+                    <input type="text" id="userSearch" class="form-input" placeholder="Nome, e-mail ou telefone" oninput="filterUsers(this.value)">
+                </div>
+                <div class="filter-group">
+                    <label class="form-label" for="userStatus">Status</label>
+                    <select id="userStatus" class="form-select" onchange="filterUsers(document.getElementById('userSearch').value)">
+                        <option value="">Todos</option>
+                        <option value="active">Ativo</option>
+                        <option value="pending">Pendente</option>
+                        <option value="inactive">Inativo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table role="table" aria-label="Lista de usuários">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>E-mail</th>
+                            <th>Telefone</th>
+                            <th>Função</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr data-user-id="1" data-status="active">
+                            <td>Maria Silva</td>
+                            <td>maria.silva@clinica.com</td>
+                            <td>(11) 98765-4321</td>
+                            <td>Gestor Institucional</td>
+                            <td><span class="status-badge status-active">Ativo</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-secondary" onclick="editUser(1)" aria-label="Editar usuário Maria Silva">Editar</button>
+                                <button class="btn btn-sm btn-primary" onclick="editPermissions(1)" aria-label="Editar permissões de Maria Silva">Permissões</button>
+                            </td>
+                        </tr>
+                        <tr data-user-id="2" data-status="active">
+                            <td>João Santos</td>
+                            <td>joao.santos@clinica.com</td>
+                            <td>(11) 97654-3210</td>
+                            <td>Farmacêutico</td>
+                            <td><span class="status-badge status-active">Ativo</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-secondary" onclick="editUser(2)" aria-label="Editar usuário João Santos">Editar</button>
+                                <button class="btn btn-sm btn-primary" onclick="editPermissions(2)" aria-label="Editar permissões de João Santos">Permissões</button>
+                            </td>
+                        </tr>
+                        <tr data-user-id="3" data-status="active">
+                            <td>Ana Costa</td>
+                            <td>ana.costa@clinica.com</td>
+                            <td>(11) 96543-2109</td>
+                            <td>Auditor</td>
+                            <td><span class="status-badge status-active">Ativo</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-secondary" onclick="editUser(3)" aria-label="Editar usuário Ana Costa">Editar</button>
+                                <button class="btn btn-sm btn-primary" onclick="editPermissions(3)" aria-label="Editar permissões de Ana Costa">Permissões</button>
+                            </td>
+                        </tr>
+                        <tr data-user-id="4" data-status="pending">
+                            <td>Pedro Oliveira</td>
+                            <td>pedro.oliveira@clinica.com</td>
+                            <td>(11) 95432-1098</td>
+                            <td>Enfermeiro</td>
+                            <td><span class="status-badge status-pending">Pendente</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-secondary" onclick="editUser(4)" aria-label="Editar usuário Pedro Oliveira">Editar</button>
+                                <button class="btn btn-sm btn-primary" onclick="editPermissions(4)" aria-label="Editar permissões de Pedro Oliveira">Permissões</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Permissions Page -->
+        <div id="permissions" class="page" role="region" aria-label="Permissões e Perfis">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Permissões e Perfis</h1>
+                    <p class="page-subtitle">Configure permissões por módulo e perfis de acesso</p>
+                </div>
+            </div>
+
+            <div class="permission-card">
+                <div class="permission-header">
+                    <div class="permission-title">Gestor Institucional</div>
+                    <label class="switch">
+                        <input type="checkbox" checked onchange="toggleProfile(this, 'gestor')" aria-label="Ativar perfil Gestor Institucional">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="permission-modules">
+                    <div class="switch-container">
+                        <label class="switch">
+                            <input type="checkbox" checked data-module="estoque" onchange="updatePermission('gestor', 'estoque', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                        <span>Estoque</span>
+                    </div>
+                    <div class="switch-container">
+                        <label class="switch">
+                            <input type="checkbox" checked data-module="pacientes" onchange="updatePermission('gestor', 'pacientes', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                        <span>Pacientes</span>
+                    </div>
+                    <div class="switch-container">
+                        <label class="switch">
+                            <input type="checkbox" checked data-module="auditoria" onchange="updatePermission('gestor', 'auditoria', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                        <span>Auditoria</span>
+                    </div>
+                    <div class="switch-container">
+                        <label class="switch">
+                            <input type="checkbox" checked data-module="rx" onchange="updatePermission('gestor', 'rx', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                        <span>RX</span>
+                    </div>
+                    <div class="switch-container">
+                        <label class="switch">
+                            <input type="checkbox" checked data-module="governanca" onchange="updatePermission('gestor', 'governanca', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                        <span>Governança</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="permission-card">
+                <div class="permission-header">
+                    <div class="permission-title">Farmacêutico</div>
+                    <label class="switch">
+                        <input type="checkbox" checked onchange="toggleProfile(this, 'farmaceutico')" aria-label="Ativar perfil Farmacêutico">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="permission-modules">
+                    <div class="switch-container">
+                        <label class="switch">
+                            <input type="checkbox" checked data-module="estoque" onchange="updatePermission('farmaceutico', 'estoque', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                        <span>Estoque</span>
+                    </div>
+                    <div class="switch-container">
+                        <label class="switch">
+                            <input type="checkbox" data-module="pacientes" onchange="updatePermission('farmaceutico', 'pacientes', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                        <span>Pacientes</span>
+                    </div>
+                    <div class="switch-container">
+                        <label class="switch">
+                            <input type="checkbox" data-module="auditoria" onchange="updatePermission('farmaceutico', 'auditoria', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                        <span>Auditoria</span>
+                    </div>
+                    <div class="switch-container">
+                        <label class="switch">
+                            <input type="checkbox" checked data-module="rx" onchange="updatePermission('farmaceutico', 'rx', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                        <span>RX</span>
+                    </div>
+                    <div class="switch-container">
+                        <label class="switch">
+                            <input type="checkbox" data-module="governanca" onchange="updatePermission('farmaceutico', 'governanca', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                        <span>Governança</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="permission-card">
+                <div class="permission-header">
+                    <div class="permission-title">Auditor</div>
+                    <label class="switch">
+                        <input type="checkbox" checked onchange="toggleProfile(this, 'auditor')" aria-label="Ativar perfil Auditor">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="permission-modules">
+                    <div class="switch-container">
+                        <label class="switch">
+                            <input type="checkbox" data-module="estoque" onchange="updatePermission('auditor', 'estoque', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                        <span>Estoque</span>
+                    </div>
+                    <div class="switch-container">
+                        <label class="switch">
+                            <input type="checkbox" data-module="pacientes" onchange="updatePermission('auditor', 'pacientes', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                        <span>Pacientes</span>
+                    </div>
+                    <div class="switch-container">
+                        <label class="switch">
+                            <input type="checkbox" checked data-module="auditoria" onchange="updatePermission('auditor', 'auditoria', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                        <span>Auditoria</span>
+                    </div>
+                    <div class="switch-container">
+                        <label class="switch">
+                            <input type="checkbox" data-module="rx" onchange="updatePermission('auditor', 'rx', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                        <span>RX</span>
+                    </div>
+                    <div class="switch-container">
+                        <label class="switch">
+                            <input type="checkbox" data-module="governanca" onchange="updatePermission('auditor', 'governanca', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                        <span>Governança</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Audit Page -->
+        <div id="audit" class="page" role="region" aria-label="Auditoria">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Auditoria</h1>
+                    <p class="page-subtitle">Histórico completo de ações na plataforma</p>
+                </div>
+                <button class="btn btn-primary" onclick="exportAudit()" aria-label="Exportar auditoria para CSV">
+                    Exportar CSV
+                </button>
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label class="form-label" for="auditUser">Usuário</label>
+                    <select id="auditUser" class="form-select" onchange="filterAudit()">
+                        <option value="">Todos os usuários</option>
+                        <option value="Maria Silva">Maria Silva</option>
+                        <option value="João Santos">João Santos</option>
+                        <option value="Ana Costa">Ana Costa</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="form-label" for="auditModule">Módulo</label>
+                    <select id="auditModule" class="form-select" onchange="filterAudit()">
+                        <option value="">Todos os módulos</option>
+                        <option value="Estoque">Estoque</option>
+                        <option value="Pacientes">Pacientes</option>
+                        <option value="Auditoria">Auditoria</option>
+                        <option value="RX">RX</option>
+                        <option value="Governança">Governança</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="form-label" for="auditDateStart">Data Inicial</label>
+                    <input type="date" id="auditDateStart" class="form-input" onchange="filterAudit()">
+                </div>
+                <div class="filter-group">
+                    <label class="form-label" for="auditDateEnd">Data Final</label>
+                    <input type="date" id="auditDateEnd" class="form-input" onchange="filterAudit()">
+                </div>
+            </div>
+
+            <div class="timeline" id="auditTimeline">
+                <div class="timeline-item" data-user="Maria Silva" data-module="Gestão de Usuários" data-date="2024-01-15">
+                    <div class="timeline-header">
+                        <span class="timeline-action">Criação de usuário</span>
+                        <span class="timeline-date">15/01/2024 14:32</span>
+                    </div>
+                    <p><strong>Usuário:</strong> Maria Silva</p>
+                    <p><strong>Ação:</strong> Criou novo usuário "Pedro Oliveira"</p>
+                    <p><strong>Módulo:</strong> Gestão de Usuários</p>
+                </div>
+                <div class="timeline-item" data-user="Maria Silva" data-module="Permissões" data-date="2024-01-15">
+                    <div class="timeline-header">
+                        <span class="timeline-action">Alteração de permissões</span>
+                        <span class="timeline-date">15/01/2024 13:15</span>
+                    </div>
+                    <p><strong>Usuário:</strong> Maria Silva</p>
+                    <p><strong>Ação:</strong> Alterou permissões do perfil "Farmacêutico"</p>
+                    <p><strong>Módulo:</strong> Permissões</p>
+                </div>
+                <div class="timeline-item" data-user="João Santos" data-module="Estoque" data-date="2024-01-15">
+                    <div class="timeline-header">
+                        <span class="timeline-action">Dispensação de medicamento</span>
+                        <span class="timeline-date">15/01/2024 11:45</span>
+                    </div>
+                    <p><strong>Usuário:</strong> João Santos</p>
+                    <p><strong>Ação:</strong> Dispensou Paracetamol 500mg - Lote #12345</p>
+                    <p><strong>Módulo:</strong> Estoque</p>
+                </div>
+                <div class="timeline-item" data-user="Maria Silva" data-module="Documentos" data-date="2024-01-15">
+                    <div class="timeline-header">
+                        <span class="timeline-action">Upload de documento</span>
+                        <span class="timeline-date">15/01/2024 10:20</span>
+                    </div>
+                    <p><strong>Usuário:</strong> Maria Silva</p>
+                    <p><strong>Ação:</strong> Enviou documento "Política de Estoque v2.1"</p>
+                    <p><strong>Módulo:</strong> Documentos</p>
+                </div>
+                <div class="timeline-item" data-user="Ana Costa" data-module="Pacientes" data-date="2024-01-15">
+                    <div class="timeline-header">
+                        <span class="timeline-action">Visualização de paciente</span>
+                        <span class="timeline-date">15/01/2024 09:10</span>
+                    </div>
+                    <p><strong>Usuário:</strong> Ana Costa</p>
+                    <p><strong>Ação:</strong> Visualizou dados do paciente "João Silva"</p>
+                    <p><strong>Módulo:</strong> Pacientes</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patients Page -->
+        <div id="patients" class="page" role="region" aria-label="Pacientes Institucionais">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Pacientes Institucionais</h1>
+                    <p class="page-subtitle">Acompanhamento de pacientes vinculados à instituição</p>
+                </div>
+            </div>
+
+            <div class="filters">
+                <div class="filter-group">
+                    <label class="form-label" for="patientSearch">Buscar</label>
+                    <input type="text" id="patientSearch" class="form-input" placeholder="Nome, CPF ou e-mail" oninput="filterPatients(this.value)">
+                </div>
+                <div class="filter-group">
+                    <label class="form-label" for="patientStatus">Status</label>
+                    <select id="patientStatus" class="form-select" onchange="filterPatients(document.getElementById('patientSearch').value)">
+                        <option value="">Todos</option>
+                        <option value="active">Ativo</option>
+                        <option value="inactive">Inativo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="patientsList">
+                <div class="patient-card" data-name="João Silva" data-status="active" onclick="viewPatientDetails(1)" role="button" tabindex="0" aria-label="Ver detalhes do paciente João Silva">
+                    <div class="patient-header">
+                        <div>
+                            <div class="patient-name">João Silva</div>
+                            <div class="patient-meta">CPF: 123.456.789-00 | E-mail: joao.silva@email.com</div>
+                        </div>
+                        <span class="status-badge status-active">Ativo</span>
+                    </div>
+                    <div class="patient-stats">
+                        <div class="patient-stat">
+                            <div class="patient-stat-label">Adesão ao Tratamento</div>
+                            <div class="patient-stat-value">87%</div>
+                            <div class="adherence-bar">
+                                <div class="adherence-fill" style="width: 87%"></div>
+                            </div>
+                        </div>
+                        <div class="patient-stat">
+                            <div class="patient-stat-label">Prescrições Ativas</div>
+                            <div class="patient-stat-value">3</div>
+                        </div>
+                        <div class="patient-stat">
+                            <div class="patient-stat-label">Última Consulta</div>
+                            <div style="font-size: 1em; color: var(--color-text-light); margin-top: 4px;">10/01/2024</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="patient-card" data-name="Maria Santos" data-status="active" onclick="viewPatientDetails(2)" role="button" tabindex="0" aria-label="Ver detalhes do paciente Maria Santos">
+                    <div class="patient-header">
+                        <div>
+                            <div class="patient-name">Maria Santos</div>
+                            <div class="patient-meta">CPF: 987.654.321-00 | E-mail: maria.santos@email.com</div>
+                        </div>
+                        <span class="status-badge status-active">Ativo</span>
+                    </div>
+                    <div class="patient-stats">
+                        <div class="patient-stat">
+                            <div class="patient-stat-label">Adesão ao Tratamento</div>
+                            <div class="patient-stat-value">92%</div>
+                            <div class="adherence-bar">
+                                <div class="adherence-fill" style="width: 92%"></div>
+                            </div>
+                        </div>
+                        <div class="patient-stat">
+                            <div class="patient-stat-label">Prescrições Ativas</div>
+                            <div class="patient-stat-value">2</div>
+                        </div>
+                        <div class="patient-stat">
+                            <div class="patient-stat-label">Última Consulta</div>
+                            <div style="font-size: 1em; color: var(--color-text-light); margin-top: 4px;">12/01/2024</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="patient-card" data-name="Pedro Costa" data-status="active" onclick="viewPatientDetails(3)" role="button" tabindex="0" aria-label="Ver detalhes do paciente Pedro Costa">
+                    <div class="patient-header">
+                        <div>
+                            <div class="patient-name">Pedro Costa</div>
+                            <div class="patient-meta">CPF: 456.789.123-00 | E-mail: pedro.costa@email.com</div>
+                        </div>
+                        <span class="status-badge status-active">Ativo</span>
+                    </div>
+                    <div class="patient-stats">
+                        <div class="patient-stat">
+                            <div class="patient-stat-label">Adesão ao Tratamento</div>
+                            <div class="patient-stat-value">65%</div>
+                            <div class="adherence-bar">
+                                <div class="adherence-fill warning" style="width: 65%"></div>
+                            </div>
+                        </div>
+                        <div class="patient-stat">
+                            <div class="patient-stat-label">Prescrições Ativas</div>
+                            <div class="patient-stat-value">1</div>
+                        </div>
+                        <div class="patient-stat">
+                            <div class="patient-stat-label">Última Consulta</div>
+                            <div style="font-size: 1em; color: var(--color-text-light); margin-top: 4px;">08/01/2024</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock Page -->
+        <div id="stock" class="page" role="region" aria-label="Farmácia e Estoque">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Farmácia / Estoque</h1>
+                    <p class="page-subtitle">Gestão integrada com FLUAP STOCK</p>
+                </div>
+            </div>
+
+            <div class="stock-grid">
+                <div class="stock-card critical">
+                    <h3>Estoque Crítico</h3>
+                    <div class="stock-item">
+                        <div class="stock-item-info">
+                            <div class="stock-item-name">Paracetamol 500mg</div>
+                            <div class="stock-item-detail">Qtd: 15 unidades</div>
+                        </div>
+                        <span class="status-badge" style="background: var(--color-danger); color: white;">CRÍTICO</span>
+                    </div>
+                    <div class="stock-item">
+                        <div class="stock-item-info">
+                            <div class="stock-item-name">Dipirona 1g</div>
+                            <div class="stock-item-detail">Qtd: 8 unidades</div>
+                        </div>
+                        <span class="status-badge" style="background: var(--color-danger); color: white;">CRÍTICO</span>
+                    </div>
+                </div>
+
+                <div class="stock-card warning">
+                    <h3>Validades Próximas</h3>
+                    <div class="stock-item">
+                        <div class="stock-item-info">
+                            <div class="stock-item-name">Amoxicilina 500mg</div>
+                            <div class="stock-item-detail">Vence em 15 dias</div>
+                        </div>
+                        <span class="status-badge" style="background: var(--color-warning); color: #856404;">ATENÇÃO</span>
+                    </div>
+                    <div class="stock-item">
+                        <div class="stock-item-info">
+                            <div class="stock-item-name">Ibuprofeno 400mg</div>
+                            <div class="stock-item-detail">Vence em 22 dias</div>
+                        </div>
+                        <span class="status-badge" style="background: var(--color-warning); color: #856404;">ATENÇÃO</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-lg">
+                <h3 style="margin-bottom: var(--spacing-md); color: var(--color-primary);">Movimentações Recentes</h3>
+                <div class="table-container">
+                    <table role="table" aria-label="Movimentações de estoque">
+                        <thead>
+                            <tr>
+                                <th>Medicamento</th>
+                                <th>Lote</th>
+                                <th>Tipo</th>
+                                <th>Quantidade</th>
+                                <th>Data</th>
+                                <th>Usuário</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Paracetamol 500mg</td>
+                                <td>#12345</td>
+                                <td>Dispensação</td>
+                                <td style="color: var(--color-danger);">-5</td>
+                                <td>15/01/2024 11:45</td>
+                                <td>João Santos</td>
+                            </tr>
+                            <tr>
+                                <td>Amoxicilina 500mg</td>
+                                <td>#12346</td>
+                                <td>Entrada</td>
+                                <td style="color: var(--color-success);">+100</td>
+                                <td>14/01/2024 09:30</td>
+                                <td>Maria Silva</td>
+                            </tr>
+                            <tr>
+                                <td>Dipirona 1g</td>
+                                <td>#12347</td>
+                                <td>Dispensação</td>
+                                <td style="color: var(--color-danger);">-10</td>
+                                <td>13/01/2024 16:20</td>
+                                <td>João Santos</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documents Page -->
+        <div id="documents" class="page" role="region" aria-label="Documentos Institucionais">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Documentos Institucionais</h1>
+                    <p class="page-subtitle">Biblioteca de documentos e políticas</p>
+                </div>
+                <button class="btn btn-primary" onclick="openDocumentModal()" aria-label="Upload de novo documento">
+                    + Upload Documento
+                </button>
+            </div>
+
+            <div id="documentsList">
+                <div class="document-card">
+                    <div class="document-info">
+                        <div class="document-name">Política de Estoque v2.1</div>
+                        <div class="document-meta">Enviado por Maria Silva em 15/01/2024 | Versão 2.1 | PDF (2.3 MB)</div>
+                    </div>
+                    <div class="document-actions">
+                        <button class="btn btn-sm btn-primary" onclick="viewDocument(1)" aria-label="Visualizar Política de Estoque">Visualizar</button>
+                        <button class="btn btn-sm btn-secondary" onclick="viewDocumentVersions(1)" aria-label="Ver versões do documento">Versões</button>
+                    </div>
+                </div>
+
+                <div class="document-card">
+                    <div class="document-info">
+                        <div class="document-name">Manual de Procedimentos Farmacêuticos</div>
+                        <div class="document-meta">Enviado por João Santos em 10/01/2024 | Versão 1.0 | PDF (5.1 MB)</div>
+                    </div>
+                    <div class="document-actions">
+                        <button class="btn btn-sm btn-primary" onclick="viewDocument(2)" aria-label="Visualizar Manual de Procedimentos">Visualizar</button>
+                        <button class="btn btn-sm btn-secondary" onclick="viewDocumentVersions(2)" aria-label="Ver versões do documento">Versões</button>
+                    </div>
+                </div>
+
+                <div class="document-card">
+                    <div class="document-info">
+                        <div class="document-name">Protocolo de Auditoria Interna</div>
+                        <div class="document-meta">Enviado por Ana Costa em 05/01/2024 | Versão 3.2 | PDF (1.8 MB)</div>
+                    </div>
+                    <div class="document-actions">
+                        <button class="btn btn-sm btn-primary" onclick="viewDocument(3)" aria-label="Visualizar Protocolo de Auditoria">Visualizar</button>
+                        <button class="btn btn-sm btn-secondary" onclick="viewDocumentVersions(3)" aria-label="Ver versões do documento">Versões</button>
+                    </div>
+                </div>
+
+                <div class="document-card">
+                    <div class="document-info">
+                        <div class="document-name">Política de Privacidade e LGPD</div>
+                        <div class="document-meta">Enviado por Maria Silva em 01/01/2024 | Versão 1.5 | PDF (3.2 MB)</div>
+                    </div>
+                    <div class="document-actions">
+                        <button class="btn btn-sm btn-primary" onclick="viewDocument(4)" aria-label="Visualizar Política de Privacidade">Visualizar</button>
+                        <button class="btn btn-sm btn-secondary" onclick="viewDocumentVersions(4)" aria-label="Ver versões do documento">Versões</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- User Modal -->
+    <div id="userModal" class="modal" role="dialog" aria-labelledby="userModalTitle" aria-modal="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="userModalTitle">Criar Novo Usuário</h2>
+                <button class="close-btn" onclick="closeUserModal()" aria-label="Fechar modal">&times;</button>
+            </div>
+            <form id="userForm" onsubmit="handleUserSubmit(event)">
+                <div class="form-group">
+                    <label class="form-label required" for="userName">Nome Completo</label>
+                    <input type="text" id="userName" class="form-input" placeholder="Digite o nome completo" required>
+                    <div class="form-error" id="userNameError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label required" for="userEmail">E-mail</label>
+                    <input type="email" id="userEmail" class="form-input" placeholder="usuario@clinica.com" required>
+                    <div class="form-error" id="userEmailError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="userPhone">Telefone</label>
+                    <input type="tel" id="userPhone" class="form-input" placeholder="(11) 98765-4321">
+                </div>
+                <div class="form-group">
+                    <label class="form-label required" for="userRole">Função</label>
+                    <select id="userRole" class="form-select" required>
+                        <option value="">Selecione uma função</option>
+                        <option value="Gestor Institucional">Gestor Institucional</option>
+                        <option value="Farmacêutico">Farmacêutico</option>
+                        <option value="Auditor">Auditor</option>
+                        <option value="Enfermeiro">Enfermeiro</option>
+                        <option value="Médico">Médico</option>
+                    </select>
+                    <div class="form-error" id="userRoleError"></div>
+                </div>
+                <div class="flex flex-between gap-md" style="margin-top: var(--spacing-lg);">
+                    <button type="button" class="btn btn-secondary" onclick="closeUserModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="userSubmitBtn">
+                        Criar Usuário
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Document Modal -->
+    <div id="documentModal" class="modal" role="dialog" aria-labelledby="documentModalTitle" aria-modal="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="documentModalTitle">Upload de Documento</h2>
+                <button class="close-btn" onclick="closeDocumentModal()" aria-label="Fechar modal">&times;</button>
+            </div>
+            <form id="documentForm" onsubmit="handleDocumentSubmit(event)">
+                <div class="form-group">
+                    <label class="form-label required" for="documentName">Nome do Documento</label>
+                    <input type="text" id="documentName" class="form-input" placeholder="Ex: Política de Estoque" required>
+                    <div class="form-error" id="documentNameError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label required" for="documentVersion">Versão</label>
+                    <input type="text" id="documentVersion" class="form-input" placeholder="Ex: 1.0" required>
+                    <div class="form-error" id="documentVersionError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label required" for="documentFile">Arquivo</label>
+                    <input type="file" id="documentFile" class="form-input" accept=".pdf,.doc,.docx" required>
+                    <div class="form-error" id="documentFileError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="documentDescription">Descrição</label>
+                    <textarea id="documentDescription" class="form-textarea" rows="4" placeholder="Descrição do documento"></textarea>
+                </div>
+                <div class="flex flex-between gap-md" style="margin-top: var(--spacing-lg);">
+                    <button type="button" class="btn btn-secondary" onclick="closeDocumentModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="documentSubmitBtn">
+                        Enviar Documento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ========== Navigation ==========
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show selected page
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+            
+            // Update nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                link.removeAttribute('aria-current');
+            });
+            
+            const activeLink = document.querySelector(`[data-page="${pageId}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+                activeLink.setAttribute('aria-current', 'page');
+            }
+
+            // Update URL hash
+            window.history.pushState({page: pageId}, '', `#${pageId}`);
+        }
+
+        // Add click handlers to nav links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const pageId = this.getAttribute('data-page');
+                showPage(pageId);
+            });
+        });
+
+        // Handle browser back/forward
+        window.addEventListener('popstate', function(e) {
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                showPage(hash);
+            } else {
+                showPage('dashboard');
+            }
+        });
+
+        // Handle initial hash
+        if (window.location.hash) {
+            showPage(window.location.hash.substring(1));
+        }
+
+        // ========== Modal Functions ==========
+        function openUserModal() {
+            const modal = document.getElementById('userModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('userName').focus();
+        }
+
+        function closeUserModal() {
+            const modal = document.getElementById('userModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+            document.getElementById('userForm').reset();
+            clearFormErrors('userForm');
+        }
+
+        function openDocumentModal() {
+            const modal = document.getElementById('documentModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('documentName').focus();
+        }
+
+        function closeDocumentModal() {
+            const modal = document.getElementById('documentModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+            document.getElementById('documentForm').reset();
+            clearFormErrors('documentForm');
+        }
+
+        // Close modals on outside click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+
+        // Close modals on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal.active').forEach(modal => {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+            }
+        });
+
+        // ========== Toast Notifications ==========
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.setAttribute('role', 'alert');
+            
+            const icons = {
+                success: '✓',
+                error: '✕',
+                warning: '⚠'
+            };
+            
+            toast.innerHTML = `
+                <span class="toast-icon" aria-hidden="true">${icons[type] || icons.success}</span>
+                <span class="toast-message">${message}</span>
+                <button class="toast-close" onclick="this.parentElement.remove()" aria-label="Fechar notificação">&times;</button>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.style.animation = 'slideInRight 0.3s reverse';
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 5000);
+        }
+
+        // ========== Form Validation ==========
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function validatePhone(phone) {
+            const re = /^\(\d{2}\)\s\d{4,5}-\d{4}$/;
+            return re.test(phone);
+        }
+
+        function showFieldError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            const errorDiv = document.getElementById(fieldId + 'Error');
+            
+            if (field) {
+                field.classList.add('error');
+            }
+            
+            if (errorDiv) {
+                errorDiv.textContent = message;
+                errorDiv.classList.add('show');
+            }
+        }
+
+        function clearFieldError(fieldId) {
+            const field = document.getElementById(fieldId);
+            const errorDiv = document.getElementById(fieldId + 'Error');
+            
+            if (field) {
+                field.classList.remove('error');
+            }
+            
+            if (errorDiv) {
+                errorDiv.classList.remove('show');
+                errorDiv.textContent = '';
+            }
+        }
+
+        function clearFormErrors(formId) {
+            const form = document.getElementById(formId);
+            if (form) {
+                form.querySelectorAll('.form-error').forEach(error => {
+                    error.classList.remove('show');
+                    error.textContent = '';
+                });
+                form.querySelectorAll('.form-input, .form-select').forEach(input => {
+                    input.classList.remove('error');
+                });
+            }
+        }
+
+        // ========== User Form Handler ==========
+        function handleUserSubmit(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('userName').value.trim();
+            const email = document.getElementById('userEmail').value.trim();
+            const phone = document.getElementById('userPhone').value.trim();
+            const role = document.getElementById('userRole').value;
+            
+            let isValid = true;
+            
+            // Clear previous errors
+            ['userName', 'userEmail', 'userPhone', 'userRole'].forEach(id => clearFieldError(id));
+            
+            // Validate name
+            if (!name || name.length < 3) {
+                showFieldError('userName', 'Nome deve ter pelo menos 3 caracteres');
+                isValid = false;
+            }
+            
+            // Validate email
+            if (!email || !validateEmail(email)) {
+                showFieldError('userEmail', 'E-mail inválido');
+                isValid = false;
+            }
+            
+            // Validate phone (if provided)
+            if (phone && !validatePhone(phone)) {
+                showFieldError('userPhone', 'Telefone inválido. Use o formato (11) 98765-4321');
+                isValid = false;
+            }
+            
+            // Validate role
+            if (!role) {
+                showFieldError('userRole', 'Selecione uma função');
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                return;
+            }
+            
+            // Show loading
+            const submitBtn = document.getElementById('userSubmitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loading"></span> Criando...';
+            
+            // Simulate API call
+            setTimeout(() => {
+                showToast('Usuário criado com sucesso!', 'success');
+                closeUserModal();
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+                
+                // In a real app, you would add the user to the table here
+            }, 1500);
+        }
+
+        // ========== Document Form Handler ==========
+        function handleDocumentSubmit(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('documentName').value.trim();
+            const version = document.getElementById('documentVersion').value.trim();
+            const file = document.getElementById('documentFile').files[0];
+            
+            let isValid = true;
+            
+            // Clear previous errors
+            ['documentName', 'documentVersion', 'documentFile'].forEach(id => clearFieldError(id));
+            
+            // Validate name
+            if (!name || name.length < 3) {
+                showFieldError('documentName', 'Nome do documento deve ter pelo menos 3 caracteres');
+                isValid = false;
+            }
+            
+            // Validate version
+            if (!version) {
+                showFieldError('documentVersion', 'Versão é obrigatória');
+                isValid = false;
+            }
+            
+            // Validate file
+            if (!file) {
+                showFieldError('documentFile', 'Selecione um arquivo');
+                isValid = false;
+            } else if (file.size > 10 * 1024 * 1024) { // 10MB
+                showFieldError('documentFile', 'Arquivo muito grande. Máximo: 10MB');
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                return;
+            }
+            
+            // Show loading
+            const submitBtn = document.getElementById('documentSubmitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loading"></span> Enviando...';
+            
+            // Simulate API call
+            setTimeout(() => {
+                showToast('Documento enviado com sucesso!', 'success');
+                closeDocumentModal();
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }, 1500);
+        }
+
+        // ========== Filter Functions ==========
+        let filterTimeout;
+
+        function filterUsers(searchTerm) {
+            clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(() => {
+                const status = document.getElementById('userStatus').value;
+                const rows = document.querySelectorAll('#usersTableBody tr');
+                const searchLower = searchTerm.toLowerCase();
+                
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    const rowStatus = row.getAttribute('data-status');
+                    
+                    const matchesSearch = !searchTerm || text.includes(searchLower);
+                    const matchesStatus = !status || rowStatus === status;
+                    
+                    row.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+                });
+            }, 300);
+        }
+
+        function filterPatients(searchTerm) {
+            clearTimeout(filterTimeout);
+            filterTimeout = setTimeout(() => {
+                const status = document.getElementById('patientStatus').value;
+                const cards = document.querySelectorAll('#patientsList .patient-card');
+                const searchLower = searchTerm.toLowerCase();
+                
+                cards.forEach(card => {
+                    const name = card.getAttribute('data-name').toLowerCase();
+                    const text = card.textContent.toLowerCase();
+                    const cardStatus = card.getAttribute('data-status');
+                    
+                    const matchesSearch = !searchTerm || name.includes(searchLower) || text.includes(searchLower);
+                    const matchesStatus = !status || cardStatus === status;
+                    
+                    card.style.display = (matchesSearch && matchesStatus) ? '' : 'none';
+                });
+            }, 300);
+        }
+
+        function filterAudit() {
+            const user = document.getElementById('auditUser').value;
+            const module = document.getElementById('auditModule').value;
+            const dateStart = document.getElementById('auditDateStart').value;
+            const dateEnd = document.getElementById('auditDateEnd').value;
+            
+            const items = document.querySelectorAll('#auditTimeline .timeline-item');
+            
+            items.forEach(item => {
+                const itemUser = item.getAttribute('data-user');
+                const itemModule = item.getAttribute('data-module');
+                const itemDate = item.getAttribute('data-date');
+                
+                const matchesUser = !user || itemUser === user;
+                const matchesModule = !module || itemModule === module;
+                const matchesDateStart = !dateStart || itemDate >= dateStart;
+                const matchesDateEnd = !dateEnd || itemDate <= dateEnd;
+                
+                item.style.display = (matchesUser && matchesModule && matchesDateStart && matchesDateEnd) ? '' : 'none';
+            });
+        }
+
+        // ========== User Functions ==========
+        function editUser(id) {
+            showToast('Carregando dados do usuário...', 'info');
+            // In a real app, load user data and populate the form
+            setTimeout(() => {
+                openUserModal();
+                document.getElementById('userModalTitle').textContent = 'Editar Usuário';
+            }, 500);
+        }
+
+        function editPermissions(id) {
+            showPage('permissions');
+            showToast(`Editando permissões do usuário ID: ${id}`, 'info');
+        }
+
+        function viewPatientDetails(id) {
+            showToast(`Carregando detalhes do paciente ID: ${id}...`, 'info');
+            // In a real app, open a modal or navigate to patient details page
+        }
+
+        function exportAudit() {
+            showToast('Exportando dados de auditoria para CSV...', 'info');
+            // In a real app, generate and download CSV file
+            setTimeout(() => {
+                showToast('Arquivo CSV gerado com sucesso!', 'success');
+            }, 2000);
+        }
+
+        function viewDocument(id) {
+            showToast(`Abrindo documento ID: ${id}...`, 'info');
+        }
+
+        function viewDocumentVersions(id) {
+            showToast(`Carregando versões do documento ID: ${id}...`, 'info');
+        }
+
+        // ========== Permission Functions ==========
+        function toggleProfile(checkbox, profileId) {
+            const card = checkbox.closest('.permission-card');
+            const modules = card.querySelectorAll('input[data-module]');
+            
+            modules.forEach(module => {
+                module.disabled = !checkbox.checked;
+                if (!checkbox.checked) {
+                    module.checked = false;
+                }
+            });
+            
+            showToast(`Perfil ${checkbox.checked ? 'ativado' : 'desativado'}`, 'success');
+        }
+
+        function updatePermission(profileId, moduleId, enabled) {
+            // In a real app, send API request to update permission
+            showToast(`Permissão ${enabled ? 'habilitada' : 'desabilitada'}: ${moduleId}`, 'success');
+        }
+
+        // ========== Keyboard Navigation ==========
+        document.addEventListener('keydown', function(e) {
+            // Navigate pages with arrow keys when sidebar is focused
+            if (e.target.closest('.sidebar')) {
+                const links = Array.from(document.querySelectorAll('.nav-link'));
+                const currentIndex = links.findIndex(link => link.classList.contains('active'));
+                
+                if (e.key === 'ArrowDown' && currentIndex < links.length - 1) {
+                    e.preventDefault();
+                    links[currentIndex + 1].click();
+                    links[currentIndex + 1].focus();
+                } else if (e.key === 'ArrowUp' && currentIndex > 0) {
+                    e.preventDefault();
+                    links[currentIndex - 1].click();
+                    links[currentIndex - 1].focus();
+                }
+            }
+        });
+
+        // ========== Initialize ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add real-time validation
+            document.getElementById('userEmail')?.addEventListener('blur', function() {
+                if (this.value && !validateEmail(this.value)) {
+                    showFieldError('userEmail', 'E-mail inválido');
+                } else {
+                    clearFieldError('userEmail');
+                }
+            });
+            
+            // Format phone input
+            document.getElementById('userPhone')?.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 0) {
+                    if (value.length <= 2) {
+                        value = `(${value}`;
+                    } else if (value.length <= 7) {
+                        value = `(${value.slice(0, 2)}) ${value.slice(2)}`;
+                    } else {
+                        value = `(${value.slice(0, 2)}) ${value.slice(2, 7)}-${value.slice(7, 11)}`;
+                    }
+                }
+                e.target.value = value;
+            });
+        });
+    </script>
+</body>
+</html>
